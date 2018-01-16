@@ -1,6 +1,12 @@
 # Coindesk
 
+![CoinDesk](https://godoc.org/github.com/gostudent/coindesk?status.svg)
+[![Travis Branch](https://img.shields.io/travis/gostudent/coindesk/master.svg)](https://travis-ci.org/gostudent.coindesk)
+
 coindesk is a Go package to access Coindesk API
+
+## Documentation:
+[GoDoc](https://godoc.org/github.com/gostudent/coindesk)
 
 ## Installations & Usage
 

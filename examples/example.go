@@ -15,8 +15,7 @@ func main() {
 	USD, GBP, EUR := coindesk.CurrentPrice()
 	fmt.Println(USD, GBP, EUR)
 	
-	var historyPrice []Price
-	historyPrice = coindesk.HistoryPrice("2013-09-01", "2013-09-05")
+	historyPrice := coindesk.HistoryPrice("2013-09-01", "2013-09-05")
 	fmt.Println("Date\t\tPrice")
 	for _, i := range historyPrice {
 		fmt.Print(i.date.Format("2006-01-02"), "\t")

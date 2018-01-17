@@ -9,7 +9,14 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
+
+type Price struct {
+	date time.Time
+	price float64
+}
+
 
 // GetPrice fetches the latest Bitcoin price from coindesk API in given currency.
 // s is the ISO code of the currency. Defaults to USD.
@@ -42,6 +49,42 @@ func GetPrice(s ...string) float64 {
 	}
 
 	return output
+}
+
+// HistoryPrice takes in startDate and endDate as input
+// It returns an array of Price struct
+func HistoryPrice(startDate string, endDate string) []Price {
+	url := "https://api.coindesk.com/v1/bpi/historical/close.json?start="+startDate+"&end="+endDate
+
+	var history []Price //Array of struct containing Prices from startDate to endDate
+
+	response, err := http.Get(url)
+
+	if err != nil {
+		fmt.Print(err.Error())
+		os.Exit(1)
+	}
+
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	body := string(responseData)
+
+	var m map[string]gjson.Result
+	m = gjson.Get(body, "bpi").Map()
+	layout := "2006-01-02"
+
+	for t, p := range(m) {
+		date, err := time.Parse(layout, t)
+		if err != nil {
+			fmt.Println(err)
+		}
+		history = append(history, Price{date, p.Num})
+	}
+
+	return history
 }
 
 // CurrentPrice fetches current price of Bitcoin from coindesk API.
@@ -79,4 +122,34 @@ func CurrentPrice() (float64, float64, float64) {
 	}
 
 	return USD, GBP, EUR
+}
+
+// Yesterday returns yesterday's price
+func Yesterday() float64{
+	url := "https://api.coindesk.com/v1/bpi/historical/close.json?for=yesterday"
+
+	response, err := http.Get(url)
+
+	if err != nil {
+		fmt.Print(err.Error())
+		os.Exit(1)
+	}
+
+	responseData, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	body := string(responseData)
+	var m map[string]gjson.Result
+	m = gjson.Get(body, "bpi").Map()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, p := range(m) {
+		return p.Num //Returns the yesterdays price
+	}
+
+	return 0
 }
